@@ -27,12 +27,12 @@ export default function App() {
         setGoodCount((prev) => prev + 1);
         break;
 
-      case "neutral":
-        setNeutralCount((prev) => prev + 1);
-        break;
-
       case "bad":
         setBadCount((prev) => prev + 1);
+        break;
+
+      case "neutral":
+        setNeutralCount((prev) => prev + 1);
         break;
 
       default:

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useReducer } from "react";
 import Section from "components/Section";
 import FeedbackOptions from "components/FeedbackOptions";
 import Statistics from "components/Statistics";
@@ -10,46 +10,43 @@ const optionsText = {
   bad: "Bad",
 };
 
-export default function App() {
-  const [goodCount, setGoodCount] = useState(0);
-  const [neutralCount, setNeutralCount] = useState(0);
-  const [badCount, setBadCount] = useState(0);
+function countReducer(state, actions) {
+  switch (actions.type) {
+    case "good":
+      return { ...state, good: state.good + actions.payload };
 
-  const feedbackCount = {
-    good: goodCount,
-    neutral: neutralCount,
-    bad: badCount,
-  };
+    case "neutral":
+      return { ...state, neutral: state.neutral + actions.payload };
+
+    case "bad":
+      return { ...state, bad: state.bad + actions.payload };
+
+    default:
+      return;
+  }
+}
+
+export default function App() {
+  const [state, dispatch] = useReducer(countReducer, {
+    good: 0,
+    neutral: 0,
+    bad: 0,
+  });
 
   function handleFeedback(e) {
-    switch (e.target.name) {
-      case "good":
-        setGoodCount((prev) => prev + 1);
-        break;
-
-      case "bad":
-        setBadCount((prev) => prev + 1);
-        break;
-
-      case "neutral":
-        setNeutralCount((prev) => prev + 1);
-        break;
-
-      default:
-        return;
-    }
+    dispatch({ type: e.target.name, payload: 1 });
   }
 
   function countTotalFeedback() {
     let total = 0;
-    for (const key in feedbackCount) {
-      total += feedbackCount[key];
+    for (const key in state) {
+      total += state[key];
     }
     return total;
   }
 
   function countPositiveFeedbackPercentage() {
-    return Math.round((goodCount / countTotalFeedback()) * 100);
+    return Math.round((state.good / countTotalFeedback()) * 100);
   }
   return (
     <div>
@@ -63,7 +60,7 @@ export default function App() {
         <Section title="Statistics">
           <Statistics
             options={optionsText}
-            feedbackCount={feedbackCount}
+            feedbackCount={state}
             total={countTotalFeedback()}
             positivePercentage={countPositiveFeedbackPercentage()}
           />
